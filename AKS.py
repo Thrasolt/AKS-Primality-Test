@@ -53,7 +53,7 @@ def calculate_limit_for_general_fermat(number: int, r: int) -> int:
     return math.floor(math.sqrt(phi(r)) * math.log2(number))
 
 
-def check_polynomial_fermat(number: int, r: int, upper_limit: int) -> Property:
+def check_polynomial_fermat(number: int, r: int) -> Property:
     upper_limit: int = calculate_limit_for_general_fermat(number, r)
     for candidate in range(1, upper_limit + 1):
         if False:
