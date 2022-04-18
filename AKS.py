@@ -1,34 +1,19 @@
 import math
 import enum
 
+from number_theory import is_co_prime, order, get_next_co_prime, phi
+from polynomial_fermat import check_single_polynomial_congruence
+
+
 class Property(enum.Enum):
     COMPOSITE = 0
     PRIME = 1
 
 
-def is_co_prime(first: int, second: int) -> bool:
-    return math.gcd(first, second) == 1
-
-
-def phi(n):
-    count = 1
-    for candidate in range(2, n):
-        if is_co_prime(candidate, n):
-            count += 1
-    return count
-
-
-def order(number: int, base: int) -> int:
-    exponent: int = 1
-    while number**exponent % base != 1:
-        exponent += 1
-    return exponent
-
-
 def find_r(number: int,  upper_limit) -> int:
-    r: int = 2
+    r: int = get_next_co_prime(number, 2)
     while order(number, r) < upper_limit:
-        r += 1
+        r = get_next_co_prime(number, r+1)
     return r
 
 
@@ -46,6 +31,7 @@ def is_perfect_power(number: int) -> bool:
         while base**power <= number:
             if base**power == number:
                 return True
+            power += 1
     return False
 
 
@@ -55,13 +41,13 @@ def calculate_limit_for_general_fermat(number: int, r: int) -> int:
 
 def check_polynomial_fermat(number: int, r: int) -> Property:
     upper_limit: int = calculate_limit_for_general_fermat(number, r)
-    for candidate in range(1, upper_limit + 1):
-        if False:
+    for constant_term in range(1, upper_limit + 1):
+        if not check_single_polynomial_congruence(number, r, constant_term):
             return Property.COMPOSITE
     return Property.PRIME
 
 
-def is_prime(number: int) -> Property:
+def aks_primality(number: int) -> Property:
     assert number > 1, "The input number must be greater than 1"
     if is_perfect_power(number):
         return Property.COMPOSITE
@@ -71,4 +57,9 @@ def is_prime(number: int) -> Property:
     if has_non_trivial_gcd(number, r):
         return Property.COMPOSITE
 
-    return Property.PRIME
+    return check_polynomial_fermat(number, r)
+
+
+if __name__ == '__main__':
+    print(aks_primality(7919))
+    print(aks_primality(933199))
